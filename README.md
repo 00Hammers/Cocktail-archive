@@ -5,6 +5,6 @@ I'm using db_create.py merely to get a grasp on **SQLite** and the **sqlite3** l
 When the DB's got a few drinks in it, I'll build a simple prototype in python with the main functionalities before getting to the actual app.
 
 Objectives of the project:
-* getting pratical with **SQLite** with Python
+* getting pratical with **SQLite** on Python
 * having an easy recipe collection of cocktail
-* trying mobile development
+* getting a first grasp on mobile development
