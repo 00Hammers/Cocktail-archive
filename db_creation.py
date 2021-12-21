@@ -14,18 +14,35 @@ conn = sql.connect('cocktails.db')
 
 cur = conn.cursor()
 
-glasses = ['Collins','Highball','Old fashioned','Double old fashioned',
-            'Shot','Cocktail','Champagne coupe', 'Champagne flute',
-            'Snifter','Wine','Hurricane','Glencairn']
+# ingredienti = ['Pre dinner', 'After dinner', 'Any time']
 
-for glass in glasses:
-    query = """INSERT INTO glasses (name)
-                VALUES ('""" + glass + """')"""
-    cur.execute(query)
+# for x in ingredienti:
+#     query = """INSERT INTO time (name)
+#                 VALUES ('""" + x + """')"""
+#     cur.execute(query)
+
+# conn.commit()
+
+def insertCocktail(name,recipe,glass,time):
+    query = 'SELECT id FROM {} WHERE name="{}"'
+    
+    cur.execute(query.format('glasses',glass))
+    id_glass = cur.fetchone()[0]
+    
+    cur.execute(query.format('time',time))
+    id_time = cur.fetchone()[0]
+    
+    query = """INSERT INTO cocktails (name, recipe, id_glass, id_time)
+               VALUES ('{}',"{}",{},{})"""
+    
+    cur.execute(query.format(name,recipe,id_glass,id_time))
 
 conn.commit()
 
-query = "SELECT * FROM glasses"
-cur.execute(query)
+# query = "SELECT * FROM time"
+# cur.execute(query)
 
-conn.close()
+# for record in cur.fetchall():
+#     print(record)
+
+# conn.close()
