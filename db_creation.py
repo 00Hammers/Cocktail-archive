@@ -42,18 +42,28 @@ def insertCoLi(name,liquors):
         query = 'INSERT INTO co_li VALUES ("{}","{}","{}")'
         cur.execute(query.format(id_cock,x[0],x[1]))
         
-liquors = [('Vermuth rosso', '30 ml'),
-           ('Campari', '30 ml'),
-           ('Gin', '30 ml')]
+def SelectAllFrom(table):
+    query = "SELECT * FROM cocktails"
+    cur.execute(query)
+    
+    for record in cur.fetchall():
+        print(record)
 
-insertCoLi('Negroni', liquors)
+"""
+----------------------MAIN-------------------------
+"""
+
+name = "Angelo azzurro"        
+liquors = [('Gin', '60 ml'),
+           ('Triple sec', '20 ml'),
+           ('Blue curaçao', '5 ml')]
+recipe = "Versare gli ingredienti in uno shaker pieno di ghiaccio, agitare e versare in un calice martini precedentemente raffreddato.\nGuarnire eventualmente con scorza di limone."
+time = "Any time"
+glass = "Cocktail"
+
+insertCocktail(name, recipe, glass, time)
+insertCoLi(name, liquors)
 
 conn.commit()
 
-# query = "SELECT * FROM cocktails"
-# cur.execute(query)
-
-# for record in cur.fetchall():
-#     print(record)
-
-conn.close()
+# conn.close()
