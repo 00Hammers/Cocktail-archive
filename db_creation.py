@@ -66,4 +66,4 @@ insertCoLi(name, liquors)
 
 conn.commit()
 
-# conn.close()
+conn.close()
