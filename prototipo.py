@@ -3,6 +3,9 @@
 Created on Wed Dec 29 03:32:57 2021
 
 @author: Christian
+
+fomrato cocktail
+id, nome, ricetta, id glass, id time
 """
 
 import sqlite3 as sql
@@ -37,6 +40,44 @@ def getDrinksByTimeOfDay(time_of_day):
                ON c.id_glass=g.id AND c.id_time=t.id AND
                   c.id=cl.id_cocktail AND l.id=cl.id_liquor
                WHERE t.name='Any time' OR t.name='{}'""".format(time_of_day)
+    cur.execute(query)
+    
+    return cur.fetchall()
+
+def getFullDrinkInfo(name):
+    cocktail = getDrinkByName(name)
+    liquors = getLiquorsByDrink(name)
+    liquids = getLiquidsByDrink(name)
+    solids = getSolidsByDrink(name)
+    
+    return cocktail, [*liquors, *liquids, *solids]
+    
+def getLiquorsByDrink(drink):
+    query = """SELECT DISTINCT l.name, cl.quantita
+               FROM liquors AS l
+               JOIN cocktails AS c, co_li AS cl
+               ON l.id=cl.id_liquor AND c.id=cl.id_cocktail
+               WHERE c.name='{}'""".format(drink)
+    cur.execute(query)
+    
+    return cur.fetchall()
+
+def getLiquidsByDrink(drink):
+    query = """SELECT DISTINCT l.name, cl.quantita
+               FROM ingredients_liquid AS l
+               JOIN cocktails AS c, co_inl AS cl
+               ON l.id=cl.id_ingredient AND c.id=cl.id_cocktail
+               WHERE c.name='{}'""".format(drink)
+    cur.execute(query)
+    
+    return cur.fetchall()
+
+def getSolidsByDrink(drink):
+    query = """SELECT DISTINCT s.name, cs.quantita
+               FROM ingredients_solid AS s
+               JOIN cocktails AS c, co_ins AS cs
+               ON s.id=cs.id_ingredient AND c.id=cs.id_cocktail
+               WHERE c.name='{}'""".format(drink)
     cur.execute(query)
     
     return cur.fetchall()
@@ -76,6 +117,29 @@ def showByTimeOfDay():
     drinks = getDrinksByTimeOfDay(time_of_day)
     printResults(drinks)
 
+def showRicetta():
+    print("\n===================")
+    drink = input("Nome drink: ")
+    cocktail, ingredients = getFullDrinkInfo(drink)   
+    cocktail = cocktail[0]
+  
+    ricetta = cocktail[1]
+    glass = cocktail[2]
+    time = cocktail[3]
+    
+    # print("Nome: {}".format(drink))
+    print("\nRicetta:\n{}".format(ricetta))
+    
+    print("\nIngredienti:")
+    for x in ingredients:
+        print("- {}: {}".format(x[0],x[1]))
+    
+    print("\nBicchiere: {}".format(glass))
+    print("\nPeriodo: {}".format(time))
+    
+    print("\n===================")
+    
+
 # ////////// MAIN /////////////
 
 conn = sql.connect('cocktails.db')
@@ -83,33 +147,32 @@ cur = conn.cursor()
 
 cmd = 1
 while(cmd):
-    print("Menu:")
+    print("\nMenu:")
     print("[1] Mostra drink")
-    print("[2] Mostra liquori")
-    print("[3] Cerca drink per nome")
-    print("[4] Cerca drink per liquore")
-    print("[5] Cerca drink per momento del giorno")
+    print("[2] Mostra ricetta drink")
+    print("[3] Mostra liquori")
+    print("[4] Cerca drink per nome")
+    print("[5] Cerca drink per liquore")
+    print("[6] Cerca drink per momento del giorno")
     print("[0] Esci")
-    cmd = int(input("Scelta: "))
-
+    try:
+        cmd = int(input("Scelta: "))
+    except:
+        cmd = -1
+        print("Inserimento non consentito oh")
+        
     if cmd==1:
         showDrinks()
     elif cmd==2:
-        showLiquors()
+        showRicetta()
     elif cmd==3:
-        showByName()
+        showLiquors()
     elif cmd==4:
+        showByName()
+    elif cmd==7:
         showByLiquor()
-    elif cmd==5:
+    elif cmd==6:
         showByTimeOfDay()
 
 conn.close()
-
-
-
-
-
-
-
-
 
