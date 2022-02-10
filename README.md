@@ -7,8 +7,9 @@ Now the DB's got a few drinks in it, so I built a simple prototype in python wit
 Objectives of the project:
 * getting pratical with **SQLite** on Python
 * having an easy-to-use recipe collection of cocktail
-* getting a first grasp on mobile development
+* getting a first grasp on mobile development on Android Studio in Kotlin
 
 App features:
 * cocktail database
 * drink search by name, by liquor or by time of the day
+* full recipe will be displayd
