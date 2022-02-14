@@ -30,6 +30,11 @@ def insertCocktail(name,recipe,glass,time):
     
     cur.execute(query)
 
+def insertIngredient(name, table):
+    query = "INSERT INTO {} (name) VALUES ('{}')".format(table,name)
+    
+    cur.execute(query)
+
 # insert data into tables which relate cocktails to other tables in case of an N-N relation
 # elements may reffer to liquors, liquids and solid ingredients
 def insertCoRel(name, elements, table, table_rel):
@@ -67,20 +72,30 @@ def printAllFrom(table):
 ----------------------MAIN-------------------------
 """
 
-name = "Aperol Spritz"        
-liquors = [('Prosecco', '90 ml'),
-           ('Aperol', '60 ml')]
+# insertIngredient('Acqua', 'ingredients_liquid')
+# insertIngredient('Zucchero bianco', 'ingredients_solid')
+# insertIngredient('Angostura', 'liquors')
+insertIngredient('Whiskey', 'liquors')
 
-liquids = [('Seltz', '30 ml')]
+name = "Old fashioned"        
+liquors = [('Whiskey', '45 ml'),
+           ('Angostura', 'alcune gocce')]
 
-ingredients = []
+liquids = [('Acqua', 'splash')]
 
-recipe = "Versare aperol, prosecco e infine seltz in un bicchiere da vino pieno di ghiaccio.\nMescolare dolcemente e guarnire con fetta di arancia."
+ingredients = [('Zucchero bianco', 'una zolletta')]
+
+recipe = """Saturare la zolletta di zucchero con le gocce di angostura e l'acqua in un bicchiere old fashioned.
+Pestare fino a dissolvere lo zucchero.
+Riempire il bicchiere con ghiaccio, versare il whiskey.
+Mescolare dolcemente.
+Guarnire con fetta o scorza di arancia e una ciliegia al maraschino."""
+
 time = "Pre dinner"
-glass = "Wine"
+glass = "Old fashioned"
 
-# insertCocktail(name, recipe, glass, time)
-# insertCoLi(name, liquors)
+insertCocktail(name, recipe, glass, time)
+insertCoLi(name, liquors)
 insertCoInl(name, liquids)
 
 conn.commit()

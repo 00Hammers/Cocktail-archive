@@ -4,8 +4,10 @@ Created on Wed Dec 29 03:32:57 2021
 
 @author: Christian
 
-fomrato cocktail
+formato cocktail
 id, nome, ricetta, id glass, id time
+
+gestire ordine ingredienti nella visualizzazione (base, liquidi, soliti)
 """
 
 import sqlite3 as sql
@@ -51,71 +53,73 @@ def getFullDrinkInfo(name):
     solids = getSolidsByDrink(name)
     
     return cocktail, [*liquors, *liquids, *solids]
-    
-def getLiquorsByDrink(drink):
-    query = """SELECT DISTINCT l.name, cl.quantita
-               FROM liquors AS l
-               JOIN cocktails AS c, co_li AS cl
-               ON l.id=cl.id_liquor AND c.id=cl.id_cocktail
-               WHERE c.name='{}'""".format(drink)
+
+def getIngredientsByDrink(drink, table):
+    id_i = "id_ingredient"
+    if(table == "liquors"):
+        co_in = "co_li"
+        id_i = "id_liquor"
+    elif(table == "ingredients_liquid"):
+        co_in = "co_inl"
+    elif(table == "ingredients_solid"):
+        co_in = "co_ins"
+
+    query = f"""SELECT DISTINCT i.name, ci.quantita
+                FROM {table} AS i
+                JOIN cocktails AS c, {co_in} AS ci
+                ON i.id=ci.{id_i} AND c.id=ci.id_cocktail
+                WHERE c.name='{drink}'"""
     cur.execute(query)
     
     return cur.fetchall()
+
+def getLiquorsByDrink(drink):
+    return getIngredientsByDrink(drink, "liquors")
 
 def getLiquidsByDrink(drink):
-    query = """SELECT DISTINCT l.name, cl.quantita
-               FROM ingredients_liquid AS l
-               JOIN cocktails AS c, co_inl AS cl
-               ON l.id=cl.id_ingredient AND c.id=cl.id_cocktail
-               WHERE c.name='{}'""".format(drink)
-    cur.execute(query)
-    
-    return cur.fetchall()
+    return getIngredientsByDrink(drink, "ingredients_liquid")
 
 def getSolidsByDrink(drink):
-    query = """SELECT DISTINCT s.name, cs.quantita
-               FROM ingredients_solid AS s
-               JOIN cocktails AS c, co_ins AS cs
-               ON s.id=cs.id_ingredient AND c.id=cs.id_cocktail
-               WHERE c.name='{}'""".format(drink)
-    cur.execute(query)
-    
-    return cur.fetchall()
+    return getIngredientsByDrink(drink, "ingredients_solid")
 
 def printResults(results):
     for record in results:
         print(record)
         print()
     
-def showDrinks():
-    query = """SELECT c.name, c.recipe, g.name, t.name
-               FROM cocktails AS c
-               JOIN glasses AS g, time AS t
-               ON c.id_glass=g.id AND c.id_time=t.id"""
+def printNames(records, title):
+    print(f"\n{title}:")
+    for record in records:
+        print(f" - {record[0]}")
+    
+def getNames(table):
+    query = f"SELECT name FROM {table}"
     cur.execute(query)
     records = cur.fetchall()
-    printResults(records)
+    
+    return records
+    
+def showDrinks():
+    records = getNames('cocktails')
+    
+    printNames(records, 'Drink')
 
 def showLiquors():
-    query = "SELECT name FROM liquors"
-    cur.execute(query)
-    liquors = cur.fetchall()
-    printResults(liquors)
-
-def showByName():
-    name = input("Drink name: ")
-    drink = getDrinkByName(name)
-    printResults(drink)
+    records = getNames('liquors')
+    
+    printNames(records, 'Liquori')
 
 def showByLiquor():
     name = input("Liquor name: ")
     drinks = getDrinksByLiquor(name)
-    printResults(drinks)
+    
+    printNames(drinks, 'Drink')
 
 def showByTimeOfDay():
     time_of_day = input("Time of day: ")
     drinks = getDrinksByTimeOfDay(time_of_day)
-    printResults(drinks)
+    
+    printNames(drinks, 'Drink')
 
 def showRicetta():
     print("\n===================")
@@ -151,9 +155,8 @@ while(cmd):
     print("[1] Mostra drink")
     print("[2] Mostra ricetta drink")
     print("[3] Mostra liquori")
-    print("[4] Cerca drink per nome")
-    print("[5] Cerca drink per liquore")
-    print("[6] Cerca drink per momento del giorno")
+    print("[4] Cerca drink per liquore")
+    print("[5] Cerca drink per momento del giorno")
     print("[0] Esci")
     try:
         cmd = int(input("Scelta: "))
@@ -168,10 +171,8 @@ while(cmd):
     elif cmd==3:
         showLiquors()
     elif cmd==4:
-        showByName()
-    elif cmd==7:
         showByLiquor()
-    elif cmd==6:
+    elif cmd==5:
         showByTimeOfDay()
 
 conn.close()
